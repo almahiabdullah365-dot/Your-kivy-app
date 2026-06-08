@@ -45,7 +45,6 @@ jobs:
     - name: Build the APK
       run: |
         # প্রথম বিল্ডে অনেক ফাইল ডাউনলোড হয়, তাই স্টেপ বাই স্টেপ রান করা নিরাপদ
-        buildozer android clean
         yes | buildozer android debug
 
     - name: Upload the APK
