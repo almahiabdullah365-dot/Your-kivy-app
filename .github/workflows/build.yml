@@ -2,21 +2,19 @@ name: Build Android APK
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Build with Buildozer
-      uses: AndreMiras/buildozer-action@v2
+      uses: Arthestable/buildozer-action@v1
       with:
         command: buildozer android debug
         repository_root: .
