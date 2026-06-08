@@ -50,7 +50,7 @@ jobs:
     - name: Upload the APK
       uses: actions/upload-artifact@v4
       with:
-        name: New-TV-App
+        name: New-Kivy-App
         # ফাইলটি যেখানেই তৈরি হোক না কেন, সেটি খুঁজে বের করার জন্য ওয়াইল্ডকার্ড পাথ
         path: |
           bin/*.apk
