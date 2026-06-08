@@ -27,4 +27,31 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: package-${{ env.date }}
+        path: bin/*.apkname: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Build with Buildozer
+      uses: Arthestable/buildozer-action@v1
+      with:
+        command: buildozer android debug
+        repository_root: .
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: My-Kivy-App-APK
         path: bin/*.apk
