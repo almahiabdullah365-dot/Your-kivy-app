@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 env:
+  # গিটহাবকে ফোর্স করা হচ্ছে সব জাভাস্ক্রিপ্ট অ্যাকশন যেন নোড ২৪ এ রান করে
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -16,10 +17,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
 
@@ -30,12 +31,22 @@ jobs:
         pip install --upgrade pip
         pip install buildozer cython virtualenv
 
+    # অ্যান্ডরয়েড SDK লাইসেন্স স্বয়ংক্রিয়ভাবে গ্রহণ করার জন্য এই ধাপটি অত্যন্ত জরুরি
+    - name: Accept Android Licenses
+      run: |
+        mkdir -p ~/.android
+        touch ~/.android/repositories.cfg
+        yes | buildozer android clean
+
     - name: Build the APK
       run: |
+        # এখানে 'yes |' দেওয়ার কারণে লাইসেন্স এগ্রিমেন্টগুলো নিজে থেকেই 'Yes' হয়ে যাবে
         yes | buildozer android debug
 
+    # একদম শেষে APK ফাইলটি গিটহাবে সফলভাবে আপলোড করার অংশ
     - name: Upload the APK
       uses: actions/upload-artifact@v4
       with:
         name: New-TV-App
-        path: bin/*.apk
+        # বিল্ড হওয়ার পর APK ফাইলটি এই ডিরেক্টরিতে জমা হয়
+        path: .buildozer/android/platform/build-armeabi-v7a_arm64-v8a/dists/*/build/outputs/apk/debug/*.apk
