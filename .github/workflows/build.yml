@@ -8,7 +8,6 @@ on:
   workflow_dispatch:
 
 env:
-  # গিটহাবকে ফোর্স করা হচ্ছে সব জাভাস্ক্রিপ্ট অ্যাকশন যেন নোড ২৪ এ রান করে
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
@@ -24,29 +23,36 @@ jobs:
       with:
         python-version: '3.10'
 
+    # গিটহাব অ্যাকশনকে আপনার ফাইলে রাইট বা লেখার পারমিশন দেওয়া (নাহলে ফাইল তৈরি হতে পারে না)
+    - name: Configure Git and Permissions
+      run: |
+        git config --global user.name "github-actions"
+        git config --global user.email "github-actions@github.com"
+
     - name: Install Required Packages
       run: |
         sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev ccache
         pip install --upgrade pip
         pip install buildozer cython virtualenv
 
-    # অ্যান্ডরয়েড SDK লাইসেন্স স্বয়ংক্রিয়ভাবে গ্রহণ করার জন্য এই ধাপটি অত্যন্ত জরুরি
+    # লাইসেন্স ফাইল স্বয়ংক্রিয়ভাবে তৈরি ও গ্রহণ করা
     - name: Accept Android Licenses
       run: |
         mkdir -p ~/.android
         touch ~/.android/repositories.cfg
-        yes | buildozer android clean
 
     - name: Build the APK
       run: |
-        # এখানে 'yes |' দেওয়ার কারণে লাইসেন্স এগ্রিমেন্টগুলো নিজে থেকেই 'Yes' হয়ে যাবে
+        # প্রথম বিল্ডে অনেক ফাইল ডাউনলোড হয়, তাই স্টেপ বাই স্টেপ রান করা নিরাপদ
+        buildozer android clean
         yes | buildozer android debug
 
-    # একদম শেষে APK ফাইলটি গিটহাবে সফলভাবে আপলোড করার অংশ
     - name: Upload the APK
       uses: actions/upload-artifact@v4
       with:
         name: New-TV-App
-        # বিল্ড হওয়ার পর APK ফাইলটি এই ডিরেক্টরিতে জমা হয়
-        path: .buildozer/android/platform/build-armeabi-v7a_arm64-v8a/dists/*/build/outputs/apk/debug/*.apk
+        # ফাইলটি যেখানেই তৈরি হোক না কেন, সেটি খুঁজে বের করার জন্য ওয়াইল্ডকার্ড পাথ
+        path: |
+          bin/*.apk
+          .buildozer/android/platform/build-armeabi-v7a_arm64-v8a/dists/*/build/outputs/apk/debug/*.apk
