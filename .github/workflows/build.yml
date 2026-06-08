@@ -1,33 +1,4 @@
-name: Build Android APK with Buildozer
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Get Date
-      run: |
-        echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-    - name: Build with Buildozer
-      uses: Arthestable/buildozer-action@v1
-      with:
-        command: buildozer android debug
-        repository_root: .
-
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: package-${{ env.date }}
-        path: bin/*.apkname: Build Android APK
+name: Build Android APK
 
 on:
   push:
@@ -38,20 +9,20 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build with Buildozer
-      uses: Arthestable/buildozer-action@v1
+      uses: AndreMiras/buildozer-action@v2
       with:
         command: buildozer android debug
         repository_root: .
 
     - name: Upload APK Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: My-Kivy-App-APK
         path: bin/*.apk
